@@ -47,4 +47,16 @@ describe("Abrigo de Animais", () => {
     expect(resultado.erro).toBe("Brinquedo inválido");
     expect(resultado.lista).toBeFalsy();
   });
+
+  test("Deve adotar somente 1 gato quando brinquedos já usados", () => {
+    const resultado = new AbrigoAnimais().encontraPessoas(
+      "BOLA,RATO,LASER",
+      "RATO,BOLA",
+      "Mimi,Fofo"
+    );
+
+    expect(resultado.lista[0]).toBe("Fofo - abrigo");
+    expect(resultado.lista[1]).toBe("Mimi - pessoa 1");
+
+  });
 });

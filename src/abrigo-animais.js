@@ -118,25 +118,20 @@ class AbrigoAnimais {
       let destino = `${nomeAnimal} - abrigo`;
 
       if (primeiraPessoaQualificada && !segundaPessoaQualificada) {
-        const brinquedosJaUsados = brinquedosUsadosPessoa1.some((brinquedo) => {
-          animal.brinquedos.some(
-            (animalBrinquedo) => animalBrinquedo === brinquedo
-          );
+        const brinquedosJaUsados = animal.brinquedos.some((brinquedo) => {
+         return brinquedosUsadosPessoa1.includes(brinquedo);
         });
-
+        
         if (animal.especie === "gato" && brinquedosJaUsados) {
           primeiraPessoaQualificada = false;
         } else {
           destino = `${nomeAnimal} - pessoa 1`;
           quantidadeDeAnimaisAdotadosDaPessoa1++;
+          brinquedosUsadosPessoa1.push(...animal.brinquedos);
         }
-
-        brinquedosUsadosPessoa1.push(...animal.brinquedos);
       } else if (!primeiraPessoaQualificada && segundaPessoaQualificada) {
-        const brinquedosJaUsados = brinquedosUsadosPessoa1.some((brinquedo) => {
-          animal.brinquedos.some(
-            (animalBrinquedo) => animalBrinquedo === brinquedo
-          );
+        const brinquedosJaUsados = animal.brinquedos.some((brinquedo) => {
+          return brinquedosUsadosPessoa2.includes(brinquedo);
         });
 
         if (animal.especie === "gato" && brinquedosJaUsados) {
@@ -144,11 +139,10 @@ class AbrigoAnimais {
         } else {
           destino = `${nomeAnimal} - pessoa 2`;
           quantidadeDeAnimaisAdotadosDaPessoa2++;
+          brinquedosUsadosPessoa2.push(...animal.brinquedos);
         }
-
-        brinquedosUsadosPessoa2.push(...animal.brinquedos);
       }
-
+     
       listaResultadoFinal.push(destino);
     }
 
