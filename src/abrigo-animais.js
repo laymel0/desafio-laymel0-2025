@@ -1,6 +1,5 @@
-//Classe que representa um abrigo de animais
 class AbrigoAnimais {
-  listaDeBrinquedos; // Lista com os brinquedos disponíveis
+  listaDeBrinquedos;
   animaisNoRecinto;
 
   constructor() {
@@ -40,7 +39,6 @@ class AbrigoAnimais {
         brinquedos: ["SKATE", "RATO"],
       },
     }),
-      // Iniciando a lista de brinquedos
       (this.listaDeBrinquedos = [
         "RATO",
         "BOLA",
@@ -50,45 +48,117 @@ class AbrigoAnimais {
         "SKATE",
       ]);
   }
-  // Método principal do abrigo irá receber os brinquedos das duas pessoas e a orde dos animais
+
   encontraPessoas(
     brinquedosPessoa1 = "",
     brinquedosPessoa2 = "",
     ordemAnimais = ""
   ) {
-    // Trasforma strings em listas
-    //Divide a tring que veio sepada por virgulas em um array
-    const brinquedos1 = brinquedosPessoa1.split(",");
-    const brinquedos2 = brinquedosPessoa2.split(",");
-    const animaisParaBusca = ordemAnimais.split(",");
+    const brinquedos1 = brinquedosPessoa1
+      .split(",")
+      .map((brinquedo) => brinquedo.trim().toUpperCase());
+    const brinquedos2 = brinquedosPessoa2
+      .split(",")
+      .map((brinquedo) => brinquedo.trim().toUpperCase());
+    const animaisParaBusca = ordemAnimais
+      .split(",")
+      .map(
+        (animal) =>
+          animal.charAt(0).toUpperCase() + animal.slice(1).toLowerCase()
+      );
 
-    //  Verifica se tem brinquedo inválido ou se repete
-    //O resultado será true se tiver algum brinquedo que não existe na lista ou se tiver brinquedo duplicado
     const brinquedoInvalido =
       this.verificarSeBrinquedoInvalido(brinquedos1) ||
       this.verificarSeBrinquedoInvalido(brinquedos2);
 
-    // se for true então retorna erro e para o método, isso quer dizer que não chega a verificar os animais
     if (brinquedoInvalido) {
       return { erro: "Brinquedo inválido" };
     }
 
-    // Se passou até aqui ele irá verifica se tem animal inválido ou se repete
     const animalInvalido = this.verificarSeAnimalInvalido(animaisParaBusca);
     if (animalInvalido) {
       return { erro: "Animal inválido" };
     }
+
     let quantidadeDeAnimaisAdotadosDaPessoa1 = 0;
     let quantidadeDeAnimaisAdotadosDaPessoa2 = 0;
+    const brinquedosUsadosPessoa1 = [];
+    const brinquedosUsadosPessoa2 = [];
+    const listaResultadoFinal = [];
 
     for (const nomeAnimal of animaisParaBusca) {
+      let primeiraPessoaQualificada;
+      let segundaPessoaQualificada;
+
       const animal = this.animaisNoRecinto[nomeAnimal];
-      this.verificarOrdemDosBrinquedos(brinquedos1, animal.brinquedos);
-      this.verificarOrdemDosBrinquedos(brinquedos2, animal.brinquedos);
+      if (nomeAnimal === "Loco") {
+        primeiraPessoaQualificada =
+          quantidadeDeAnimaisAdotadosDaPessoa1 < 3 &&
+          this.verificarOrdemDosBrinquedos(
+            brinquedos1,
+            animal.brinquedos,
+            quantidadeDeAnimaisAdotadosDaPessoa1 > 0
+          );
+        segundaPessoaQualificada =
+          quantidadeDeAnimaisAdotadosDaPessoa2 < 3 &&
+          this.verificarOrdemDosBrinquedos(
+            brinquedos2,
+            animal.brinquedos,
+            quantidadeDeAnimaisAdotadosDaPessoa2 > 0
+          );
+      } else {
+        primeiraPessoaQualificada =
+          quantidadeDeAnimaisAdotadosDaPessoa1 < 3 &&
+          this.verificarOrdemDosBrinquedos(brinquedos1, animal.brinquedos);
+        segundaPessoaQualificada =
+          quantidadeDeAnimaisAdotadosDaPessoa2 < 3 &&
+          this.verificarOrdemDosBrinquedos(brinquedos2, animal.brinquedos);
+      }
+
+      let destino = `${nomeAnimal} - abrigo`;
+
+      if (primeiraPessoaQualificada && !segundaPessoaQualificada) {
+        const brinquedosJaUsados = brinquedosUsadosPessoa1.some((brinquedo) => {
+          animal.brinquedos.some(
+            (animalBrinquedo) => animalBrinquedo === brinquedo
+          );
+        });
+
+        if (animal.especie === "gato" && brinquedosJaUsados) {
+          primeiraPessoaQualificada = false;
+        } else {
+          destino = `${nomeAnimal} - pessoa 1`;
+          quantidadeDeAnimaisAdotadosDaPessoa1++;
+        }
+
+        brinquedosUsadosPessoa1.push(...animal.brinquedos);
+      } else if (!primeiraPessoaQualificada && segundaPessoaQualificada) {
+        const brinquedosJaUsados = brinquedosUsadosPessoa1.some((brinquedo) => {
+          animal.brinquedos.some(
+            (animalBrinquedo) => animalBrinquedo === brinquedo
+          );
+        });
+
+        if (animal.especie === "gato" && brinquedosJaUsados) {
+          primeiraPessoaQualificada = false;
+        } else {
+          destino = `${nomeAnimal} - pessoa 2`;
+          quantidadeDeAnimaisAdotadosDaPessoa2++;
+        }
+
+        brinquedosUsadosPessoa2.push(...animal.brinquedos);
+      }
+
+      listaResultadoFinal.push(destino);
     }
+
+    return {
+      lista: listaResultadoFinal.sort((a, b) => {
+        return a.localeCompare(b);
+      }),
+    };
   }
 
-  // Método que  irá checar os brinquedos recebidos
   verificarSeBrinquedoInvalido(brinquedos = []) {
     // Verifica se os brinquedos existem dentro da lista inicial do abrigo
     // .every () só retorna true se todos os elementos passarem na condição
@@ -108,7 +178,6 @@ class AbrigoAnimais {
     return !existeBrinquedo || existeDuplicado;
   }
 
-  // Método parecido com o de brinquedos, mas agora para animais
   verificarSeAnimalInvalido(animaisParaBusca = []) {
     // Verifica se todos os animais existem na lista inicial do abrigo
     // .every () só retorna true se todos os elementos passarem na condição
@@ -140,10 +209,6 @@ class AbrigoAnimais {
 
     let index = 0;
     for (const brinquedoPessoa of brinquedosDaPessoa) {
-      // LASER === RATO
-      // RATO === RATO
-      // BOLA === BOLA
-
       if (brinquedoPessoa === brinquedosDoAnimal[index]) {
         index++;
       }

@@ -17,6 +17,7 @@ describe("Abrigo de Animais", () => {
       "RATO,NOVELO",
       "Rex,Fofo"
     );
+
     expect(resultado.lista[0]).toBe("Fofo - abrigo");
     expect(resultado.lista[1]).toBe("Rex - pessoa 1");
     expect(resultado.lista.length).toBe(2);
@@ -46,5 +47,4 @@ describe("Abrigo de Animais", () => {
     expect(resultado.erro).toBe("Brinquedo inválido");
     expect(resultado.lista).toBeFalsy();
   });
-
 });
